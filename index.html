@@ -1,421 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CypherScape Secured VPN — Tactical Command</title>
-  <style>
-    :root {
-      --bg-obsidian: #060709;
-      --bg-carbon: #0d1015;
-      --bg-card: #131720;
-      --gold-primary: #d4af37;
-      --gold-bright: #f5d061;
-      --gold-glow: rgba(212, 175, 55, 0.35);
-      --text-main: #f1f3f5;
-      --text-muted: #8b949e;
-      --status-green: #00e676;
-      --status-red: #ff3b30;
-      --border-subtle: rgba(212, 175, 55, 0.22);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-
-    body {
-      background-color: var(--bg-obsidian);
-      color: var(--text-main);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      padding: 16px;
-    }
-
-    .app-shell {
-      width: 100%;
-      max-width: 480px;
-      background: linear-gradient(180deg, var(--bg-carbon) 0%, var(--bg-obsidian) 100%);
-      border: 1px solid var(--border-subtle);
-      border-radius: 24px;
-      padding: 22px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 24px rgba(212, 175, 55, 0.08);
-    }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      padding-bottom: 14px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .brand-title {
-      font-size: 1.05rem;
-      font-weight: 800;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--gold-primary);
-    }
-
-    .brand-sub {
-      font-size: 0.7rem;
-      letter-spacing: 2px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-    }
-
-    .badge-007 {
-      background: rgba(212, 175, 55, 0.12);
-      border: 1px solid var(--gold-primary);
-      color: var(--gold-bright);
-      font-size: 0.7rem;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 999px;
-      letter-spacing: 1px;
-    }
-
-    /* Tactical Shield Hub */
-    .shield-hub {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 20px 0 28px;
-    }
-
-    .shield-btn {
-      width: 156px;
-      height: 156px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #1c222e, #090b0f);
-      border: 2px solid var(--border-subtle);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.35s ease;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-      position: relative;
-    }
-
-    .shield-btn.connected {
-      border-color: var(--gold-bright);
-      box-shadow: 0 0 38px var(--gold-glow), inset 0 0 20px rgba(212, 175, 55, 0.2);
-    }
-
-    .shield-icon {
-      width: 58px;
-      height: 58px;
-      fill: var(--text-muted);
-      transition: all 0.35s ease;
-    }
-
-    .shield-btn.connected .shield-icon {
-      fill: var(--gold-bright);
-      filter: drop-shadow(0 0 10px var(--gold-glow));
-    }
-
-    .shield-label {
-      margin-top: 10px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 1.8px;
-      text-transform: uppercase;
-      color: var(--text-muted);
-    }
-
-    .shield-btn.connected .shield-label {
-      color: var(--gold-bright);
-    }
-
-    .status-readout {
-      margin-top: 16px;
-      text-align: center;
-    }
-
-    .status-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-
-    .dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: var(--status-red);
-      box-shadow: 0 0 8px var(--status-red);
-    }
-
-    .dot.active {
-      background: var(--status-green);
-      box-shadow: 0 0 10px var(--status-green);
-    }
-
-    .ip-display {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      margin-top: 5px;
-      font-family: monospace;
-    }
-
-    /* Telemetry Gauges */
-    .telemetry-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-
-    .metric-card {
-      background: var(--bg-card);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 14px;
-      padding: 12px 10px;
-      text-align: center;
-    }
-
-    .metric-label {
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-    }
-
-    .metric-value {
-      font-size: 1.05rem;
-      font-weight: 800;
-      color: var(--gold-bright);
-      font-family: monospace;
-    }
-
-    /* Server Selector */
-    .panel {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 16px;
-      padding: 14px;
-      margin-bottom: 16px;
-    }
-
-    .panel-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: var(--gold-primary);
-      margin-bottom: 8px;
-      display: block;
-      font-weight: 700;
-    }
-
-    select {
-      width: 100%;
-      background: var(--bg-obsidian);
-      color: var(--text-main);
-      border: 1px solid rgba(212, 175, 55, 0.35);
-      border-radius: 10px;
-      padding: 12px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      outline: none;
-    }
-
-    /* App Integrity Scanner */
-    .scanner-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .scan-btn {
-      background: linear-gradient(135deg, var(--gold-primary), #b38b22);
-      color: #060709;
-      border: none;
-      border-radius: 10px;
-      padding: 9px 14px;
-      font-size: 0.78rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      cursor: pointer;
-    }
-
-    .scan-result {
-      margin-top: 10px;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
-
-    .footer-guarantee {
-      text-align: center;
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      margin-top: 14px;
-      letter-spacing: 0.5px;
-    }
-
-    .footer-guarantee span {
-      color: var(--gold-primary);
-      font-weight: 700;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CypherSkape VPN — Simple, Private Browsing | cypherskapevpn.com</title>
+<meta name="description" content="CypherSkape VPN: 200+ server locations, unlimited bandwidth, and use on up to 3 devices for $11.79/month. Available for Android, Windows, and macOS.">
+<link rel="stylesheet" href="Main.css">
 </head>
 <body>
-  <div class="app-shell">
-    <div class="header">
-      <div class="brand">
-        <div>
-          <div class="brand-title">CypherScape</div>
-          <div class="brand-sub">Secured Tactical VPN</div>
-        </div>
-      </div>
-      <div class="badge-007">AES-256-GCM</div>
-    </div>
-
-    <div class="shield-hub">
-      <button class="shield-btn" id="connectBtn" onclick="toggleVPN()">
-        <svg class="shield-icon" viewBox="0 0 24 24">
-          <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
-        </svg>
-        <span class="shield-label" id="btnText">Engage</span>
-      </button>
-
-      <div class="status-readout">
-        <div class="status-pill">
-          <span class="dot" id="statusDot"></span>
-          <span id="statusText">Unprotected</span>
-        </div>
-        <div class="ip-display" id="ipDisplay">EXPOSED IP: 192.168.1.44 (ISP VISIBLE)</div>
-      </div>
-    </div>
-
-    <div class="telemetry-grid">
-      <div class="metric-card">
-        <div class="metric-label">Download</div>
-        <div class="metric-value" id="downSpeed">0.0 Mbps</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">Upload</div>
-        <div class="metric-value" id="upSpeed">0.0 Mbps</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">Latency</div>
-        <div class="metric-value" id="pingVal">-- ms</div>
-      </div>
-    </div>
-
-    <div class="panel">
-      <label class="panel-label" for="serverSelect">11-City Global Routing Node</label>
-      <select id="serverSelect" onchange="updateNode()">
-        <option value="185.220.101.14|14 ms">Zurich, Switzerland — Vault Node 01</option>
-        <option value="198.51.100.88|19 ms">New York, USA — Wall St. Backbone</option>
-        <option value="203.0.113.42|22 ms">Dallas, USA — South Central Core</option>
-        <option value="172.67.188.9|28 ms">London, UK — MI6 Sector Relay</option>
-        <option value="104.21.44.119|34 ms">Frankfurt, Germany — DE-CIX Hub</option>
-        <option value="185.199.108.53|41 ms">Reykjavik, Iceland — Offshore Privacy</option>
-        <option value="149.154.167.91|46 ms">Amsterdam, Netherlands — NL-IX</option>
-        <option value="45.33.32.156|68 ms">Tokyo, Japan — APAC Optical Link</option>
-        <option value="103.21.244.12|74 ms">Singapore — Strait Encrypted Node</option>
-        <option value="192.0.2.210|52 ms">Toronto, Canada — North Shield</option>
-        <option value="139.130.4.5|89 ms">Sydney, Australia — Southern Cross</option>
-      </select>
-    </div>
-
-    <div class="panel">
-      <div class="scanner-row">
-        <div>
-          <span class="panel-label" style="margin-bottom:2px;">App Integrity & Tracker Audit</span>
-          <div style="font-size:0.75rem; color:var(--text-muted);">Deep-scan mobile telemetry & DNS leaks</div>
-        </div>
-        <button class="scan-btn" onclick="runIntegrityScan()">Run Scan</button>
-      </div>
-      <div class="scan-result" id="scanResult">Ready. Tap Run Scan to audit active sockets and tracker blocks.</div>
-    </div>
-
-    <div class="footer-guarantee">
-      Protected by <span>CypherScape Hack-Indemnity Guarantee</span> • Zero-Log Architecture
-    </div>
-  </div>
-
-  <script>
-    let isConnected = false;
-    let speedTimer = null;
-
-    function toggleVPN() {
-      isConnected = !isConnected;
-      const btn = document.getElementById("connectBtn");
-      const btnText = document.getElementById("btnText");
-      const statusDot = document.getElementById("statusDot");
-      const statusText = document.getElementById("statusText");
-
-      if (isConnected) {
-        btn.classList.add("connected");
-        btnText.textContent = "Secured";
-        statusDot.classList.add("active");
-        statusText.textContent = "Encrypted Tunnel Active";
-        updateNode();
-        startTelemetry();
-      } else {
-        btn.classList.remove("connected");
-        btnText.textContent = "Engage";
-        statusDot.classList.remove("active");
-        statusText.textContent = "Unprotected";
-        document.getElementById("ipDisplay").textContent = "EXPOSED IP: 192.168.1.44 (ISP VISIBLE)";
-        stopTelemetry();
-      }
+<header class="site-header">
+<div class="wrap header-inner">
+<p class="brand">CypherSkape VPN</p>
+<nav aria-label="Main navigation"><a href="#pricing">Pricing</a> <a href="#locations">Locations</a> <a href="#download">Download</a></nav>
+</div>
+</header>
+<main>
+<section class="notice wrap" role="note">
+<p><strong>Preview page:</strong> This is a preview page for CypherSkape VPN. The Google Play listing is not live yet. This page does not create a real VPN tunnel and does not connect you to a VPN server.</p>
+</section>
+<section class="hero wrap">
+<h1>CypherSkape VPN</h1>
+<p class="tagline">Simple VPN protection for everyday browsing, streaming, and public Wi-Fi.</p>
+<p>CypherSkape VPN offers 200+ server locations, unlimited bandwidth, and use on up to 3 devices — for one simple price.</p>
+<p class="price-line"><strong>$11.79/month</strong> — one plan, no tiers.</p>
+<div class="buttons">
+<a class="button primary" href="#download">Get it on Google Play</a>
+<a class="button" href="#download">Download for desktop</a>
+</div>
+<p class="small">The Google Play listing is not live yet. Download links will be activated when the CypherSkape VPN app is published.</p>
+</section>
+<section class="wrap" id="features">
+<h2>What you get with CypherSkape VPN</h2>
+<ul class="features">
+<li><strong>200+ server locations</strong> — choose from locations around the world.</li>
+<li><strong>Unlimited bandwidth</strong> — browse, stream, and download without a data cap on this plan.</li>
+<li><strong>3 devices</strong> — use CypherSkape VPN on up to 3 devices at the same time.</li>
+<li><strong>One simple plan</strong> — $11.79/month.</li>
+</ul>
+</section>
+<section class="wrap" id="pricing">
+<h2>Pricing</h2>
+<div class="plan">
+<h3>CypherSkape VPN plan</h3>
+<p class="plan-price">$11.79<span>/month</span></p>
+<ul>
+<li>200+ server locations</li>
+<li>Unlimited bandwidth</li>
+<li>Up to 3 devices</li>
+<li>Android, Windows, and macOS</li>
+</ul>
+<p>There is one plan: $11.79/month.</p>
+</div>
+</section>
+<section class="wrap" id="locations">
+<h2>Server locations</h2>
+<p>CypherSkape VPN offers 200+ server locations. The searchable list below is a representative selection of cities and countries.</p>
+<label for="location-search">Search locations</label>
+<input type="search" id="location-search" placeholder="Search by city or country, for example London or Japan" aria-label="Search server locations">
+<p id="location-count"></p>
+<ul class="locations" id="location-list">
+<li>New York, United States</li><li>Los Angeles, United States</li><li>Chicago, United States</li><li>Miami, United States</li><li>San Francisco, United States</li><li>Seattle, United States</li><li>Dallas, United States</li><li>Atlanta, United States</li><li>Denver, United States</li><li>Houston, United States</li><li>Toronto, Canada</li><li>Vancouver, Canada</li><li>Montreal, Canada</li><li>London, United Kingdom</li><li>Manchester, United Kingdom</li><li>Dublin, Ireland</li><li>Paris, France</li><li>Berlin, Germany</li><li>Munich, Germany</li><li>Amsterdam, Netherlands</li><li>Madrid, Spain</li><li>Barcelona, Spain</li><li>Rome, Italy</li><li>Milan, Italy</li><li>Vienna, Austria</li><li>Zurich, Switzerland</li><li>Stockholm, Sweden</li><li>Oslo, Norway</li><li>Copenhagen, Denmark</li><li>Helsinki, Finland</li><li>Warsaw, Poland</li><li>Prague, Czechia</li><li>Budapest, Hungary</li><li>Lisbon, Portugal</li><li>Athens, Greece</li><li>Brussels, Belgium</li><li>Tokyo, Japan</li><li>Osaka, Japan</li><li>Seoul, South Korea</li><li>Singapore, Singapore</li><li>Hong Kong, China</li><li>Taipei, Taiwan</li><li>Mumbai, India</li><li>New Delhi, India</li><li>Bangkok, Thailand</li><li>Jakarta, Indonesia</li><li>Manila, Philippines</li><li>Kuala Lumpur, Malaysia</li><li>Ho Chi Minh City, Vietnam</li><li>Sydney, Australia</li><li>Melbourne, Australia</li><li>Auckland, New Zealand</li><li>Sao Paulo, Brazil</li><li>Mexico City, Mexico</li><li>Buenos Aires, Argentina</li><li>Santiago, Chile</li><li>Bogota, Colombia</li><li>Lima, Peru</li><li>Johannesburg, South Africa</li><li>Cairo, Egypt</li><li>Lagos, Nigeria</li><li>Nairobi, Kenya</li><li>Dubai, United Arab Emirates</li><li>Tel Aviv, Israel</li><li>Istanbul, Turkiye</li><li>Doha, Qatar</li>
+</ul>
+<p class="small">This is a representative list. The full list of 200+ locations will be shown in the CypherSkape VPN app when it is available.</p>
+</section>
+<section class="wrap" id="download">
+<h2>Download CypherSkape VPN</h2>
+<p><strong>Android:</strong> Get it on Google Play. The Google Play listing is not live yet — please check back when the app is published.</p>
+<p><strong>Desktop:</strong> CypherSkape VPN will be available for Windows and macOS. Desktop download links will be added here when they are ready.</p>
+<p><strong>No iPhone version in this plan:</strong> There is no iPhone version of CypherSkape VPN in this plan, and there is no App Store version.</p>
+<div class="buttons">
+<a class="button primary" href="#download">Get it on Google Play</a>
+<a class="button" href="#download">Download for Windows</a>
+<a class="button" href="#download">Download for macOS</a>
+</div>
+<p class="small">Download buttons on this preview page do not install an app yet.</p>
+</section>
+<section class="wrap">
+<h2>Before you download</h2>
+<p>This page is a preview. It does not create a real VPN tunnel, does not connect you to a VPN server, and does not show a connection status, IP address, or speed. Please wait for the published CypherSkape VPN app on Google Play, Windows, or macOS to use the service.</p>
+<p>Official site: <a href="https://cypherskapevpn.com/">cypherskapevpn.com</a></p>
+</section>
+</main>
+<footer class="site-footer">
+<div class="wrap"><p>&copy; 2026 CypherSkape VPN — cypherskapevpn.com</p></div>
+</footer>
+<script>
+(function () {
+  var input = document.getElementById('location-search');
+  var list = document.getElementById('location-list');
+  var count = document.getElementById('location-count');
+  var items = list.getElementsByTagName('li');
+  function update() {
+    var q = input.value.toLowerCase();
+    var shown = 0;
+    for (var i = 0; i < items.length; i++) {
+      var match = items[i].textContent.toLowerCase().indexOf(q) !== -1;
+      items[i].style.display = match ? '' : 'none';
+      if (match) shown++;
     }
-
-    function updateNode() {
-      if (!isConnected) return;
-      const val = document.getElementById("serverSelect").value.split("|");
-      document.getElementById("ipDisplay").textContent = "MASKED IP: " + val[0] + " (OBFUSCATED)";
-      document.getElementById("pingVal").textContent = val[1];
-    }
-
-    function startTelemetry() {
-      stopTelemetry();
-      speedTimer = setInterval(() => {
-        const down = (310 + Math.random() * 140).toFixed(1);
-        const up = (145 + Math.random() * 65).toFixed(1);
-        document.getElementById("downSpeed").textContent = down + " Mbps";
-        document.getElementById("upSpeed").textContent = up + " Mbps";
-      }, 1200);
-    }
-
-    function stopTelemetry() {
-      clearInterval(speedTimer);
-      document.getElementById("downSpeed").textContent = "0.0 Mbps";
-      document.getElementById("upSpeed").textContent = "0.0 Mbps";
-      document.getElementById("pingVal").textContent = "-- ms";
-    }
-
-    function runIntegrityScan() {
-      const out = document.getElementById("scanResult");
-      out.style.color = "#f5d061";
-      out.textContent = "Scanning active sockets, WebRTC leaks, and ad-tracker endpoints...";
-      setTimeout(() => {
-        out.style.color = "#00e676";
-        out.textContent = "✓ 0 DNS/WebRTC leaks detected. 14 background ad-trackers neutralized. Device integrity verified.";
-      }, 900);
-    }
-  </script>
+    count.textContent = shown + ' of ' + items.length + ' representative locations shown.';
+  }
+  input.addEventListener('input', update);
+  update();
+})();
+</script>
 </body>
 </html>
